@@ -7,13 +7,14 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
       SPRINGDB_USER: spicedbuser
       SPRINGDB_PASS: spicedbpass
       SPRINGDB_NAME: spicedb
       PGDATA: /data/postgres
     volumes:
        - ./db/data:/data/postgres
-       - ./db:/docker-entrypoint-initdb.d/
+       - ./db/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     ports:
       - "5432:5432"
     networks:
