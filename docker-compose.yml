@@ -12,6 +12,8 @@ services:
       SPRINGDB_PASS: spicedbpass
       SPRINGDB_NAME: spicedb
       PGDATA: /data/postgres
+    healthcheck:
+      test: pg_isready -U postgres
     volumes:
        - ./db/data:/data/postgres
        - ./db/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
@@ -32,18 +34,30 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
        - pgadmin:/var/lib/pgadmin
-
     ports:
-      - "${PGADMIN_PORT:-5050}:80"
+      - "${PGADMIN_PORT:-5050}:5050"
     networks:
       - postgres
     restart: unless-stopped
+
+  spicedb-migrate:
+    container_name: spicedb-migrate
+    image: authzed/spicedb
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    command: migrate head --datastore-engine postgres --datastore-conn-uri "postgres://spicedbuser:spicedbpass@postgresql:5432/spicedb?sslmode=disable"
+    ports:
+      - "${SPICEDB_PORT:-50051}:50051"
+    networks:
+      - postgres
 
   spicedb:
     container_name: spicedb
     image: authzed/spicedb
     depends_on:
-      - postgresql
+      spicedb-migrate:
+        condition: service_completed_successfully
     command: serve --grpc-preshared-key "somerandomkey" --datastore-engine postgres --datastore-conn-uri "postgres://spicedbuser:spicedbpass@postgresql:5432/spicedb?sslmode=disable"
     ports:
       - "${SPICEDB_PORT:-50051}:50051"
