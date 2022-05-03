@@ -1,6 +1,7 @@
 package ventures.captl.spicedbclient.controllers;
 
 import com.authzed.api.v1.PermissionService.CheckPermissionResponse.Permissionship;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,9 @@ public class RelationshipController {
   }
 
   @GetMapping("/checkRelationships")
-  public Permissionship checkRelationships(){
-    return relationshipService.checkRelationships();
+  public String checkRelationships(){
+    List<Permissionship> relationships = relationshipService.checkRelationships();
+    if(relationships!=null) return relationshipService.checkRelationships().toString();
+    else return "none";
   }
 }

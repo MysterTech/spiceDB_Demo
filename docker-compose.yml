@@ -8,9 +8,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
-      SPRINGDB_USER: spicedbuser
-      SPRINGDB_PASS: spicedbpass
-      SPRINGDB_NAME: spicedb
+      SPICEGDB_USER: spicedbuser
+      SPICEGDB_PASS: spicedbpass
+      SPICEGDB_NAME: spicedb
       PGDATA: /data/postgres
     healthcheck:
       test: pg_isready -U postgres
@@ -35,7 +35,7 @@ services:
     volumes:
        - pgadmin:/var/lib/pgadmin
     ports:
-      - "${PGADMIN_PORT:-5050}:5050"
+      - "${PGADMIN_PORT:-5050}:80"
     networks:
       - postgres
     restart: unless-stopped
