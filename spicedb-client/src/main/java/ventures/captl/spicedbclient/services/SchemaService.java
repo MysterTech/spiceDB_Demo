@@ -13,15 +13,15 @@ import org.springframework.stereotype.Service;
 @Component
 public class SchemaService {
 
-  public void persistSchema(String schema) {
-    ManagedChannel channel = ManagedChannelBuilder
-        .forTarget("localhost:50051")
-        // If SpiceDB requires TLS:
-        // .useTransportSecurity()
-        .usePlaintext()
-        .build();
+  public String persistSchema(String schema) {
+    ManagedChannel channel =
+        ManagedChannelBuilder.forTarget("api-staging.captl.ventures:50051")
+            // If SpiceDB requires TLS:
+            // .useTransportSecurity()
+            .usePlaintext()
+            .build();
 
-    BearerToken bearerToken = new BearerToken("somerandomkey");
+    BearerToken bearerToken = new BearerToken("some-random-key");
     SchemaServiceGrpc.SchemaServiceBlockingStub schemaService = SchemaServiceGrpc.newBlockingStub(channel)
         .withCallCredentials(bearerToken);
 
@@ -33,8 +33,9 @@ public class SchemaService {
     WriteSchemaResponse response;
     try {
       response = schemaService.writeSchema(request);
+      return "Schema written to service.";
     } catch (Exception e) {
-      System.out.println(e);
+      return e.toString();
     }
   }
 }

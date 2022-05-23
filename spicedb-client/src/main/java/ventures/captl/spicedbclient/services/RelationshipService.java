@@ -259,13 +259,15 @@ public class RelationshipService {
 
     try {
       String stringResponse = new String();
-      Iterator<LookupResourcesResponse> responseStream1 = permissionsService.lookupResources(expandRequest1);
+      Iterator<LookupResourcesResponse> responseStream1 =
+          permissionsService.lookupResources(expandRequest1);
       stringResponse = stringResponse.concat("Permissions for Sanjay:").concat("\n");
       while (responseStream1.hasNext()) {
         LookupResourcesResponse response = responseStream1.next();
         stringResponse = stringResponse.concat(response.toString()).concat("\n");
       }
-      Iterator<LookupResourcesResponse> responseStream2 = permissionsService.lookupResources(expandRequest2);
+      Iterator<LookupResourcesResponse> responseStream2 =
+          permissionsService.lookupResources(expandRequest2);
       stringResponse = stringResponse.concat("Permissions for Sai:").concat("\n");
       while (responseStream2.hasNext()) {
         LookupResourcesResponse response = responseStream2.next();

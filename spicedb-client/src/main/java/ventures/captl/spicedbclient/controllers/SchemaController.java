@@ -10,94 +10,63 @@ import ventures.captl.spicedbclient.services.SchemaService;
 public class SchemaController {
   String schema = """
                 definition user {}
-                
-                definition role {
-                	relation member: user
-                }
-                
-                /** resource */
-                definition page_type {
-                	relation reader_role: role
-                	relation editer_role: role
-                	relation reader_user: user
-                	relation editer_user: user
-                	relation except_reader_role: role
-                	relation except_editer_role: role
-                	relation except_reader_user: user
-                	relation except_editer_user: user
-                	permission read = (((reader_role->member - except_reader_role->member + reader_user) - except_reader_user + editer_role->member) - except_editer_role->member + editer_user) - except_editer_user
-                	permission edit = (editer_role->member - except_editer_role + editer_user) - except_editer_user
-                	permission read_role = ((reader_role - except_reader_role) + editer_role) - except_editer_role
-                	permission edit_role = editer_role - except_editer_role
-                }
-                
-                definition page {
-                	relation page_type: page_type
-                	relation reader_role: role
-                	relation editer_role: role
-                	relation reader_user: user
-                	relation editer_user: user
-                	relation except_reader_role: role
-                	relation except_editer_role: role
-                	relation except_reader_user: user
-                	relation except_editer_user: user
-                	permission read = (((page_type->read + reader_role->member - except_reader_role->member + reader_user) - except_reader_user + editer_role->member) - except_editer_role->member + editer_user) - except_editer_user
-                	permission edit = (page_type->edit + editer_role->member - except_editer_role + editer_user) - except_editer_user
-                	permission read_role = ((page_type->read_role + reader_role - except_reader_role) + editer_role) - except_editer_role
-                	permission edit_role = page_type->edit_role + editer_role - except_editer_role
-                }
-                
-                definition doc_type {
-                	relation reader_role: role
-                	relation editer_role: role
-                	relation sharer_role: role
-                	relation reader_user: user
-                	relation editer_user: user
-                	relation sharer_user: user
-                	relation except_reader_role: role
-                	relation except_editer_role: role
-                	relation except_sharer_role: role
-                	relation except_reader_user: user
-                	relation except_editer_user: user
-                	relation except_sharer_user: user
-                	permission read = (((((reader_role->member - except_reader_role->member + reader_user) - except_reader_user + editer_role->member) - except_editer_role->member + editer_user) - except_editer_user + sharer_role->member) - except_sharer_role->member + sharer_user) - except_sharer_user
-                	permission edit = (editer_role->member - except_editer_role->member + editer_user) - except_editer_user
-                	permission share = (sharer_role->member - except_sharer_role->member + sharer_user) - except_sharer_user
-                	permission read_role = ((reader_role - except_reader_role) + editer_role) - except_editer_role
-                	permission edit_role = editer_role - except_editer_role
-                	permission share_role = sharer_role - except_sharer_role
-                }
-                
-                definition document {
-                	relation doc_type: doc_type
-                	relation reader_role: role
-                	relation editer_role: role
-                	relation sharer_role: role
-                	relation reader_user: user
-                	relation editer_user: user
-                	relation sharer_user: user
-                	relation except_reader_role: role
-                	relation except_editer_role: role
-                	relation except_sharer_role: role
-                	relation except_reader_user: user
-                	relation except_editer_user: user
-                	relation except_sharer_user: user
-                	permission read = (((((doc_type->read + reader_role->member - except_reader_role->member + reader_user) - except_reader_user + editer_role->member) - except_editer_role->member + editer_user) - except_editer_user + sharer_role->member) - except_sharer_role->member + sharer_user) - except_sharer_user
-                	permission edit = (doc_type->edit + editer_role->member - except_editer_role->member + editer_user) - except_editer_user
-                	permission share = (doc_type->share + sharer_role->member - except_sharer_role->member + sharer_user) - except_sharer_user
-                	permission read_role = ((reader_role - except_reader_role) + editer_role) - except_editer_role
-                	permission edit_role = editer_role - except_editer_role
-                	permission share_role = sharer_role - except_sharer_role
-                }
+                 
+                 definition role {
+                 	relation member: user
+                 }
+                 
+                 /** resource */
+                 definition page_type {
+                 	relation reader: user | role#member
+                 	relation editer: user | role#member
+                 	relation except_reader: user | role#member
+                 	relation except_editer: user | role#member
+                 	permission read = (reader + editer - except_editer) - except_reader
+                 	permission edit = editer - except_editer
+                 }
+                 
+                 definition page {
+                 	relation page_type: page_type
+                 	relation reader: user | role#member
+                 	relation editer: user | role#member
+                 	relation except_reader: user | role#member
+                 	relation except_editer: user | role#member
+                 	permission read = (page_type->read + reader + editer - except_editer) - except_reader
+                 	permission edit = page_type->edit + editer - except_editer
+                 }
+                 
+                 definition doc_type {
+                 	relation reader: user | role#member | doc_type#reader | doc_type#editer | doc_type#sharer
+                 	relation editer: user | role#member | doc_type#editer
+                 	relation sharer: user | role#member | doc_type#sharer
+                 	relation except_reader: user | role#member | doc_type#reader | doc_type#editer | doc_type#sharer
+                 	relation except_editer: user | role#member | doc_type#editer
+                 	relation except_sharer: user | role#member | doc_type#sharer
+                 	permission read = ((reader + sharer + editer - except_reader) - except_sharer) - except_editer
+                 	permission edit = editer - except_editer
+                 	permission share = sharer - except_sharer
+                 }
+                 
+                 definition document {
+                 	relation doc_type: doc_type
+                 	relation reader: user | role#member
+                 	relation editer: user | role#member
+                 	relation sharer: user | role#member
+                 	relation except_reader: user | role#member
+                 	relation except_editer: user | role#member
+                 	relation except_sharer: user | role#member
+                 	permission read = ((doc_type->read + reader + sharer + editer - except_reader) - except_sharer) - except_editer
+                 	permission edit = doc_type->edit + editer - except_editer
+                 	permission share = doc_type->share + sharer - except_sharer
+                 }
             """;
   private SchemaService schemaService;
-
   public SchemaController(SchemaService schemaService) {
     this.schemaService = schemaService;
   }
 
   @GetMapping("/createSchema")
-  public void createSchema(){
-    schemaService.persistSchema(schema);
+  public String createSchema(){
+    return schemaService.persistSchema(schema);
   }
 }
